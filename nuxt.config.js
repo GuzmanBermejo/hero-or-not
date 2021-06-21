@@ -20,7 +20,11 @@ export default {
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
-  css: [],
+  css: [
+    '~/assets/css/spectre/spectre.css',
+    '~/assets/css/spectre/spectre-icons.css',
+    '~/assets/css/spectre/spectre-exp.css',
+  ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [],
