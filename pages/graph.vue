@@ -85,6 +85,18 @@
         </div>
       </header>
     </aside>
+    <aside id="relation-legend">
+      <span
+        v-for="[relationId, relationType] in Object.entries(HeroeRelation)"
+        :key="relationId"
+        class="p-2 chip"
+        :style="{
+          background: HeroeRelationToColor[relationType],
+          color: '#fff',
+        }"
+        >{{ relationType }}</span
+      >
+    </aside>
   </main>
 </template>
 
@@ -415,6 +427,15 @@ export default {
   position: absolute;
   bottom: 2rem;
   right: 1rem;
+}
+
+#relation-legend {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: start;
 }
 
 /* svg {
