@@ -15,6 +15,8 @@
 </template>
 
 <script>
+import * as d3 from 'd3'
+
 function createHeroId() {
   // TODO replace by something like UUID 4
   return Math.floor(Math.random() * 99999).toString()
@@ -106,6 +108,7 @@ export default {
     this.HeroeRelationToColor = HeroeRelationToColor
   },
   mounted() {
+    console.log(d3)
     this.onResize()
   },
   destroyed() {
@@ -113,7 +116,6 @@ export default {
   },
   methods: {
     onResize() {
-      console.log(this.$refs['svg-container'])
       window.addEventListener('resize', this.onResize)
       this.height = 0
       this.width = 0
