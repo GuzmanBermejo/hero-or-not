@@ -1,7 +1,11 @@
 <template>
   <div class="container">
     <ol>
-      <li v-for="heroe in heroes" :key="heroe.id">{{ heroe.name }}</li>
+      <li v-for="heroe in heroes" :key="heroe.id" class="card">
+        <header class="card-header c-hand">
+          <h5 class="card-title text-bold text-ellipsis">{{ heroe.name }}</h5>
+        </header>
+      </li>
     </ol>
   </div>
 </template>
@@ -27,6 +31,9 @@ export default {
 .container {
   margin: 0 auto;
   min-height: 100vh;
-  max-width: 960px;
+  max-width: 600px;
+}
+ol {
+  margin: 0;
 }
 </style>
