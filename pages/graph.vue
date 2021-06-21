@@ -39,13 +39,14 @@
           <g
             v-for="hero in heroes"
             :key="hero.id"
-            class="hero-node"
+            class="hero-node c-move"
             :hero-id="hero.id"
           >
             <circle :cx="hero.x" :cy="hero.y" fill="white" r="0.012"></circle>
             <text
               text-anchor="middle"
               fill="white"
+              class="bold"
               :x="hero.x"
               :y="hero.y - (0.012 + 0.01)"
               :style="{
@@ -53,6 +54,19 @@
               }"
             >
               {{ hero.name }}
+            </text>
+            <text
+              class="c-hand"
+              text-anchor="middle"
+              fill="white"
+              :x="hero.x"
+              :y="hero.y + (0.012 + 0.03)"
+              :style="{
+                fontSize: 0.002 + 'rem',
+              }"
+              @click.stop="clickNode(hero)"
+            >
+              +
             </text>
           </g>
         </g>
@@ -309,6 +323,9 @@ export default {
     A${r},${r} 0 0,1 ${point1.x},${point1.y}
   `
     },
+    clickNode(hero) {
+      console.log(hero)
+    },
     getHeroe(id) {
       return this.heroes.find((h) => h.id === id)
     },
@@ -404,6 +421,10 @@ export default {
 </script>
 
 <style>
+.bold {
+  font-weight: bold;
+}
+
 .graph-view {
   height: 100%;
   padding: 0;
@@ -438,10 +459,6 @@ export default {
   align-items: flex-start;
   padding: 0.2rem;
 }
-
-/* svg {
-  height: 100%;
-} */
 
 /* .bold {
   font-weight: bold;
