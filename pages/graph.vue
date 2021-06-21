@@ -435,7 +435,7 @@ export default {
   left: 1rem;
   display: flex;
   flex-flow: column nowrap;
-  align-items: start;
+  align-items: flex-start;
 }
 
 /* svg {
