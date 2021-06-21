@@ -37,11 +37,12 @@
             fill="none"
           ></path>
           <g v-for="hero in heroes" :key="hero.id">
+            <circle :cx="hero.x" :cy="hero.y" fill="white" r="0.018"></circle>
             <text
               text-anchor="middle"
               fill="white"
               :x="hero.x"
-              :y="hero.y"
+              :y="hero.y - (0.018 + 0.01)"
               :style="{
                 fontSize: 0.001 + 'rem',
               }"
