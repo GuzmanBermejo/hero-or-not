@@ -17,7 +17,7 @@
             <h6 class="p-2 chip bg-dark">Relations</h6>
             <ul>
               <li
-                v-for="relation in getHeroeRelations(heroe)"
+                v-for="relation in getHeroeRelationsSorted(heroe)"
                 :key="`${relation.from}->${relation.to}`"
               >
                 <span
@@ -279,6 +279,20 @@ export default {
       return this.heroesRelations.filter(
         (relation) => relation.to === heroe.id || relation.from === heroe.id
       )
+    },
+    getHeroeRelationsSorted(heroe) {
+      return this.getHeroeRelations(heroe).sort((relation1, relation2) => {
+        // Order by type
+        if (relation1.type !== relation2.type) {
+          const values = Object.values(HeroeRelation)
+          return values.indexOf(relation1.type) - values.indexOf(relation2.type)
+        }
+
+        // Order first incoming relations and after outgoing relations
+        if (relation1.from === relation2.from)
+          return collatorCompare(relation1.to, relation2.to)
+        return collatorCompare(relation1.from, relation2.from)
+      })
     },
     heroeSelect(heroe) {
       this.heroeSelected = this.heroeSelected !== heroe ? heroe : null
