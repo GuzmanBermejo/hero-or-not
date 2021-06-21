@@ -212,6 +212,10 @@ ul {
   list-style-position: outside;
 }
 
+.card-header + .divider {
+  margin-top: 0.8rem;
+}
+
 .card-body + .divider {
   margin-bottom: 0;
 }
