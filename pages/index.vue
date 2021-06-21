@@ -288,10 +288,23 @@ export default {
           return values.indexOf(relation1.type) - values.indexOf(relation2.type)
         }
 
-        // Order first incoming relations and after outgoing relations
-        if (relation1.from === relation2.from)
-          return collatorCompare(relation1.to, relation2.to)
-        return collatorCompare(relation1.from, relation2.from)
+        const isToEqual = relation1.to === relation2.to
+        if (isToEqual && relation1.to === heroe.id)
+          collatorCompare(relation1.from, relation2.from)
+
+        const isFromEqual = relation1.from === relation2.from
+        if (isFromEqual && relation1.from === heroe.id)
+          collatorCompare(relation1.to, relation2.to)
+
+        if (relation1.to === heroe.id) return -1
+        else if (relation2.to === heroe.id) return 1
+        else if (relation1.from === heroe.id) return 1
+        else if (relation2.from === heroe.id) return -1
+
+        return (
+          collatorCompare(relation1.from, relation2.from) +
+          collatorCompare(relation1.to, relation2.to)
+        )
       })
     },
     heroeSelect(heroe) {
