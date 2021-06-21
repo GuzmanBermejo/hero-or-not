@@ -36,7 +36,12 @@
             stroke-width="0.005"
             fill="none"
           ></path>
-          <g v-for="hero in heroes" :key="hero.id">
+          <g
+            v-for="hero in heroes"
+            :key="hero.id"
+            class="hero-node"
+            :hero-id="hero.id"
+          >
             <circle :cx="hero.x" :cy="hero.y" fill="white" r="0.012"></circle>
             <text
               text-anchor="middle"
@@ -86,6 +91,7 @@ const HeroeRelationToColor = {
   [HeroeRelation.ARCHENEMY]: '#e85600',
 }
 
+const clamp = d3.scaleLinear().domain([0, 1]).range([0, 1]).clamp(true)
 export default {
   data() {
     return {
@@ -93,6 +99,7 @@ export default {
       width: 0,
       d3Svg: null,
       d3Zoom: null,
+      d3G: null,
       heroes: [
         {
           id: '0',
@@ -182,9 +189,12 @@ export default {
         this.d3Svg = svg
 
         const g = svg.select('g')
+        this.d3G = g
 
+        const that = this
         function zoomed({ transform }) {
           g.attr('transform', transform)
+          that.update()
         }
 
         const zoom = d3
@@ -204,7 +214,35 @@ export default {
         svg.call(zoom.scaleTo, 1)
 
         this.d3Zoom = zoom
+
+        this.update()
       })
+    },
+    update() {
+      function dragstarted() {
+        d3.select(this).raise()
+      }
+
+      const that = this
+      function dragged(event) {
+        const hero = that.getHeroe(this.getAttribute('hero-id'))
+        hero.x = clamp(event.x)
+        hero.y = clamp(event.y)
+      }
+
+      function dragended() {
+        that.update()
+      }
+
+      this.d3G
+        .selectAll('.hero-node')
+        .call(
+          d3
+            .drag()
+            .on('start', dragstarted)
+            .on('drag', dragged)
+            .on('end', dragended)
+        )
     },
     zoomBy(amount) {
       if (this.d3Svg && this.d3Zoom)
