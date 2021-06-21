@@ -8,8 +8,34 @@
         :height="height"
         :width="width"
       >
+        <!-- https://observablehq.com/@d3/mobile-patent-suits -->
+        <marker
+          v-for="[relationId, relationType] in Object.entries(HeroeRelation)"
+          :id="`arrow-${relationType}`"
+          :key="relationId"
+          viewBox="0 -5 10 10"
+          refX="15"
+          refY="-0.5"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto"
+        >
+          <path
+            :fill="HeroeRelationToColor[relationType]"
+            d="M0,-5L10,0L0,5"
+          ></path>
+        </marker>
         <g>
-          <rect width="1" height="1" fill="red" />
+          <rect width="1" height="1" fill="darkslateblue" />
+          <path
+            v-for="relation in heroesRelations"
+            :key="JSON.stringify(relation)"
+            :d="linkArc(getHeroe(relation.from), getHeroe(relation.to))"
+            :stroke="HeroeRelationToColor[relation.type]"
+            :marker-end="`url(#arrow-${relation.type}`"
+            stroke-width="0.005"
+            fill="none"
+          ></path>
           <g v-for="hero in heroes" :key="hero.id">
             <text
               text-anchor="middle"
@@ -135,7 +161,6 @@ export default {
     this.HeroeRelationToColor = HeroeRelationToColor
   },
   mounted() {
-    console.log(d3)
     this.onResize()
   },
   destroyed() {
@@ -189,6 +214,14 @@ export default {
     },
     zoomOut() {
       this.zoomBy(0.8)
+    },
+    linkArc(point1, point2) {
+      // https://observablehq.com/@d3/mobile-patent-suits
+      const r = Math.hypot(point1.x - point2.x, point1.y - point2.y)
+      return `
+    M${point2.x},${point2.y}
+    A${r},${r} 0 0,1 ${point1.x},${point1.y}
+  `
     },
     getHeroe(id) {
       return this.heroes.find((h) => h.id === id)
