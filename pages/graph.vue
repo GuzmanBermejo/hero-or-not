@@ -66,15 +66,45 @@
         <i class="icon icon-minus"></i>
       </button>
     </aside>
+    <aside id="hero-add" class="card">
+      <header class="card-header">
+        <div class="input-group">
+          <input
+            v-model="heroAddForm.name"
+            class="form-input h5 card-title text-bold"
+            type="text"
+            placeholder="Name of hero"
+          />
+          <button
+            class="btn btn-primary input-group-btn"
+            :class="{ disabled: !heroAddForm.name.length }"
+            @click="heroAdd"
+          >
+            <i class="icon icon-people"></i>+ Add
+          </button>
+        </div>
+      </header>
+    </aside>
   </main>
 </template>
 
 <script>
 import * as d3 from 'd3'
 
+function random(min, max) {
+  return Math.random() * (max - min) + min
+}
+
 function createHeroId() {
   // TODO replace by something like UUID 4
-  return Math.floor(Math.random() * 99999).toString()
+  return Math.floor(random(0, 99999)).toString()
+}
+
+function createHeroPoint() {
+  return {
+    x: random(0.25, 0.75),
+    y: random(0.25, 0.75),
+  }
 }
 
 const collatorCompare = new Intl.Collator('en').compare
@@ -143,7 +173,7 @@ export default {
         },
       ],
       heroeSelected: null,
-      heroeAddForm: {
+      heroAddForm: {
         name: '',
       },
       relationAddForm: {
@@ -244,6 +274,11 @@ export default {
             .on('end', dragended)
         )
     },
+    updateNextTick() {
+      this.$nextTick(() => {
+        this.update()
+      })
+    },
     zoomBy(amount) {
       if (this.d3Svg && this.d3Zoom)
         this.d3Svg.transition().call(this.d3Zoom.scaleBy, amount)
@@ -300,17 +335,20 @@ export default {
     heroeSelect(heroe) {
       this.heroeSelected = this.heroeSelected !== heroe ? heroe : null
 
-      this.resetHeroeAddForm()
+      this.resetHeroAddForm()
       this.resetRelationAddForm()
     },
-    heroeAdd() {
+    heroAdd() {
       const heroe = {
         id: createHeroId(),
-        name: this.heroeAddForm.name,
+        name: this.heroAddForm.name,
+        ...createHeroPoint(),
       }
       this.heroes.push(heroe)
 
       this.heroeSelect(heroe)
+
+      this.updateNextTick()
     },
     relationAdd() {
       const relation = this.relationAddForm
@@ -331,8 +369,8 @@ export default {
 
       this.resetRelationAddForm()
     },
-    resetHeroeAddForm() {
-      this.heroeAddForm = {
+    resetHeroAddForm() {
+      this.heroAddForm = {
         name: '',
       }
     },
@@ -371,6 +409,12 @@ export default {
   right: 1rem;
   display: flex;
   flex-flow: column nowrap;
+}
+
+#hero-add {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
 }
 
 /* svg {
