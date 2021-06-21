@@ -16,8 +16,8 @@
           viewBox="0 -5 10 10"
           refX="15"
           refY="-0.5"
-          markerWidth="6"
-          markerHeight="6"
+          markerWidth="4"
+          markerHeight="4"
           orient="auto"
         >
           <path
@@ -37,12 +37,12 @@
             fill="none"
           ></path>
           <g v-for="hero in heroes" :key="hero.id">
-            <circle :cx="hero.x" :cy="hero.y" fill="white" r="0.018"></circle>
+            <circle :cx="hero.x" :cy="hero.y" fill="white" r="0.012"></circle>
             <text
               text-anchor="middle"
               fill="white"
               :x="hero.x"
-              :y="hero.y - (0.018 + 0.01)"
+              :y="hero.y - (0.012 + 0.01)"
               :style="{
                 fontSize: 0.001 + 'rem',
               }"
