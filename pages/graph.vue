@@ -8,9 +8,32 @@
         :height="height"
         :width="width"
       >
-        <rect width="1" height="1" fill="red" />
+        <g>
+          <rect width="1" height="1" fill="red" />
+          <g v-for="hero in heroes" :key="hero.id">
+            <text
+              text-anchor="middle"
+              fill="white"
+              :x="hero.x"
+              :y="hero.y"
+              :style="{
+                fontSize: 0.001 + 'rem',
+              }"
+            >
+              {{ hero.name }}
+            </text>
+          </g>
+        </g>
       </svg>
     </div>
+    <aside id="zoom-controls">
+      <button class="btn btn-sm" @click="zoomIn">
+        <i class="icon icon-plus"></i>
+      </button>
+      <button class="btn btn-sm" @click="zoomOut">
+        <i class="icon icon-minus"></i>
+      </button>
+    </aside>
   </main>
 </template>
 
@@ -41,13 +64,17 @@ export default {
     return {
       height: 0,
       width: 0,
+      d3Svg: null,
+      d3Zoom: null,
       heroes: [
         {
           id: '0',
           name: 'Batman',
+          x: 0.2,
+          y: 0.3,
         },
-        { id: '1', name: 'Robin' },
-        { id: '2', name: 'The Joker' },
+        { id: '1', name: 'Robin', x: 0.8, y: 0.3 },
+        { id: '2', name: 'The Joker', x: 0.5, y: 0.7 },
       ],
       heroesRelations: [
         {
@@ -124,7 +151,44 @@ export default {
           this.$refs['svg-container'].getBoundingClientRect()
         this.height = height
         this.width = width
+
+        const svg = d3.select('svg')
+        this.d3Svg = svg
+
+        const g = svg.select('g')
+
+        function zoomed({ transform }) {
+          g.attr('transform', transform)
+        }
+
+        const zoom = d3
+          .zoom()
+          .extent([
+            [0, 0],
+            [1, 1],
+          ])
+          .scaleExtent([0.5, 1.5])
+          .translateExtent([
+            [-0.1, -0.1],
+            [1.1, 1.1],
+          ])
+          .on('zoom', zoomed)
+
+        svg.call(zoom)
+        svg.call(zoom.scaleTo, 1)
+
+        this.d3Zoom = zoom
       })
+    },
+    zoomBy(amount) {
+      if (this.d3Svg && this.d3Zoom)
+        this.d3Svg.transition().call(this.d3Zoom.scaleBy, amount)
+    },
+    zoomIn() {
+      this.zoomBy(1.25)
+    },
+    zoomOut() {
+      this.zoomBy(0.8)
     },
     getHeroe(id) {
       return this.heroes.find((h) => h.id === id)
@@ -222,9 +286,19 @@ export default {
   height: 100%;
   padding: 0;
   background-color: turquoise;
+  position: relative;
 }
+
 #svg-container {
   height: 100%;
+}
+
+#zoom-controls {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-flow: column nowrap;
 }
 
 /* svg {
