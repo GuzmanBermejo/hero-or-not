@@ -11,38 +11,47 @@
             ]"
           ></i>
         </header>
-        <section v-if="heroe === heroeSelected" class="card-body">
-          <h6 class="p-2 chip bg-dark">Relations</h6>
-          <ul>
-            <li
-              v-for="relation in getHeroeRelations(heroe)"
-              :key="`${relation.from}->${relation.to}`"
-            >
-              <span
-                class="text-ellipsis"
-                :class="{ bold: relation.from !== heroe.id }"
-                >{{ getHeroe(relation.from).name }}</span
+        <template v-if="heroe === heroeSelected">
+          <div class="divider"></div>
+          <section class="card-body">
+            <h6 class="p-2 chip bg-dark">Relations</h6>
+            <ul>
+              <li
+                v-for="relation in getHeroeRelations(heroe)"
+                :key="`${relation.from}->${relation.to}`"
               >
-              <span> is </span>
-              <span
-                class="p-2 chip"
-                :style="{
-                  background: HeroeRelationToColor[relation.type],
-                  color: '#fff',
-                }"
-                >{{ relation.type }}</span
-              >
-              <span>
-                {{ relation.type !== HeroeRelation.NEUTRAL ? 'of' : 'to' }}
-              </span>
-              <span
-                class="text-ellipsis"
-                :class="{ bold: relation.to !== heroe.id }"
-                >{{ getHeroe(relation.to).name }}</span
-              >
-            </li>
-          </ul>
-        </section>
+                <span
+                  class="text-ellipsis"
+                  :class="{ bold: relation.from !== heroe.id }"
+                  >{{ getHeroe(relation.from).name }}</span
+                >
+                <span> is </span>
+                <span
+                  class="p-2 chip"
+                  :style="{
+                    background: HeroeRelationToColor[relation.type],
+                    color: '#fff',
+                  }"
+                  >{{ relation.type }}</span
+                >
+                <span>
+                  {{ relation.type !== HeroeRelation.NEUTRAL ? 'of' : 'to' }}
+                </span>
+                <span
+                  class="text-ellipsis"
+                  :class="{ bold: relation.to !== heroe.id }"
+                  >{{ getHeroe(relation.to).name }}</span
+                >
+              </li>
+            </ul>
+          </section>
+          <div class="divider"></div>
+          <footer class="card-footer">
+            <button class="btn btn-sm">
+              <i class="icon icon-resize-horiz"></i> Add relation
+            </button>
+          </footer>
+        </template>
       </li>
       <li class="card">
         <header class="card-header">
@@ -184,9 +193,11 @@ export default {
   min-height: 100vh;
   max-width: 600px;
 }
+
 ol {
   margin: 0;
 }
+
 header {
   display: flex;
   flex-flow: row nowrap;
@@ -199,5 +210,9 @@ h5 {
 
 ul {
   list-style-position: outside;
+}
+
+.card-body + .divider {
+  margin-bottom: 0;
 }
 </style>
