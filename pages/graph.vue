@@ -85,7 +85,7 @@
         </div>
       </header>
     </aside>
-    <aside id="relation-legend">
+    <aside id="relation-legend" class="card">
       <span
         v-for="[relationId, relationType] in Object.entries(HeroeRelation)"
         :key="relationId"
@@ -436,6 +436,7 @@ export default {
   display: flex;
   flex-flow: column nowrap;
   align-items: flex-start;
+  padding: 0.2rem;
 }
 
 /* svg {
