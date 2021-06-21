@@ -6,6 +6,20 @@
           <h5 class="card-title text-bold text-ellipsis">{{ heroe.name }}</h5>
         </header>
       </li>
+      <li class="card">
+        <header class="card-header">
+          <div class="input-group">
+            <input
+              class="form-input h5 card-title text-bold"
+              type="text"
+              placeholder="Name of heroe"
+            />
+            <button class="btn btn-primary input-group-btn">
+              <i class="icon icon-people"></i>+ Add
+            </button>
+          </div>
+        </header>
+      </li>
     </ol>
   </div>
 </template>
