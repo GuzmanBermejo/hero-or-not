@@ -1,7 +1,7 @@
 <template>
   <main class="container">
     <ol>
-      <li v-for="heroe in heroes" :key="heroe.id" class="card">
+      <li v-for="heroe in heroesSorted" :key="heroe.id" class="card">
         <header class="card-header c-hand">
           <h5 class="card-title text-bold text-ellipsis">{{ heroe.name }}</h5>
         </header>
@@ -34,6 +34,9 @@ function createHeroId() {
   // TODO replace by something like UUID 4
   return Math.floor(Math.random() * 99999).toString()
 }
+
+const collatorCompare = new Intl.Collator('en').compare
+
 export default {
   data() {
     return {
@@ -49,6 +52,13 @@ export default {
         name: '',
       },
     }
+  },
+  computed: {
+    heroesSorted() {
+      return [...this.heroes].sort((heroe1, heroe2) =>
+        collatorCompare(heroe1.name, heroe2.name)
+      )
+    },
   },
   methods: {
     heroeAdd() {
