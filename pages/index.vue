@@ -25,7 +25,7 @@
                   :class="{ bold: relation.from !== heroe.id }"
                   >{{ getHeroe(relation.from).name }}</span
                 >
-                <span> is </span>
+                <span> {{ isText(relation.type) }} </span>
                 <span
                   class="p-2 chip"
                   :style="{
@@ -35,7 +35,7 @@
                   >{{ relation.type }}</span
                 >
                 <span>
-                  {{ relation.type !== HeroeRelation.NEUTRAL ? 'of' : 'to' }}
+                  {{ ofText(relation.type) }}
                 </span>
                 <span
                   class="text-ellipsis"
@@ -47,9 +47,115 @@
           </section>
           <div class="divider"></div>
           <footer class="card-footer">
-            <button class="btn btn-sm">
-              <i class="icon icon-resize-horiz"></i> Add relation
-            </button>
+            <div>
+              <a href="#relation-modal" class="btn btn-sm"
+                ><i class="icon icon-resize-horiz"></i> Add relation</a
+              >
+              <div id="relation-modal" class="modal modal-sm">
+                <a
+                  href="#modals-sizes"
+                  aria-label="Close"
+                  class="modal-overlay"
+                ></a>
+                <div role="document" class="modal-container">
+                  <div class="modal-header">
+                    <a
+                      href="#modals-sizes"
+                      aria-label="Close"
+                      class="btn btn-clear float-right"
+                    ></a>
+                    <div class="modal-title h5">New relation</div>
+                  </div>
+                  <div class="modal-body">
+                    <form>
+                      <div class="form-group">
+                        <label class="form-label">Heroe</label>
+                        <select
+                          v-model="relationAddForm.from"
+                          class="form-select"
+                        >
+                          <option disabled value="">Select a heroe</option>
+                          <option
+                            v-for="heroeFrom in heroesSorted.filter(
+                              (h) => h.id !== relationAddForm.to
+                            )"
+                            :key="heroeFrom.id"
+                            :value="heroeFrom.id"
+                            class="text-ellipsis"
+                          >
+                            {{ heroeFrom.name }}
+                          </option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">{{
+                          isText(relationAddForm.type)
+                        }}</label>
+                        <select
+                          v-model="relationAddForm.type"
+                          class="form-select"
+                          :class="{
+                            //'select-white': relationAddForm.type !== null,
+                          }"
+                          :style="
+                            relationAddForm.type !== null
+                              ? {
+                                  color: '#fff',
+                                  'background-color':
+                                    HeroeRelationToColor[relationAddForm.type],
+                                  'background-image': whiteBackgroundImage,
+                                }
+                              : {}
+                          "
+                        >
+                          <option
+                            v-for="[relationId, relationType] in Object.entries(
+                              HeroeRelation
+                            )"
+                            :key="relationId"
+                            :value="relationType"
+                          >
+                            {{ relationType }}
+                          </option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">{{
+                          ofText(relationAddForm.type)
+                        }}</label>
+                        <select
+                          v-model="relationAddForm.to"
+                          class="form-select"
+                        >
+                          <option disabled value="">Select a heroe</option>
+                          <option
+                            v-for="heroeTo in heroesSorted.filter(
+                              (h) => h.id !== relationAddForm.from
+                            )"
+                            :key="heroeTo.id"
+                            :value="heroeTo.id"
+                            class="text-ellipsis"
+                          >
+                            {{ heroeTo.name }}
+                          </option>
+                        </select>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="modal-footer">
+                    <a
+                      href="#modals-sizes"
+                      class="btn btn-primary column col-12"
+                      :class="{
+                        disabled: isRelationAddFormIncomplete,
+                      }"
+                      @click="relationAdd"
+                      ><i class="icon icon-resize-horiz"></i> Add relation</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
           </footer>
         </template>
       </li>
@@ -143,6 +249,12 @@ export default {
       heroeAddForm: {
         name: '',
       },
+      relationAddForm: {
+        from: null,
+        to: null,
+        type: null,
+      },
+      whiteBackgroundImage: `url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23ffffff'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E")`,
     }
   },
   computed: {
@@ -150,6 +262,9 @@ export default {
       return [...this.heroes].sort((heroe1, heroe2) =>
         collatorCompare(heroe1.name, heroe2.name)
       )
+    },
+    isRelationAddFormIncomplete() {
+      return Object.values(this.relationAddForm).includes(null)
     },
   },
   created() {
@@ -167,6 +282,9 @@ export default {
     },
     heroeSelect(heroe) {
       this.heroeSelected = this.heroeSelected !== heroe ? heroe : null
+
+      this.resetHeroeAddForm()
+      this.resetRelationAddForm()
     },
     heroeAdd() {
       const heroe = {
@@ -175,9 +293,44 @@ export default {
       }
       this.heroes.push(heroe)
 
-      this.heroeAddForm.name = ''
-
       this.heroeSelect(heroe)
+    },
+    relationAdd() {
+      const relation = this.relationAddForm
+
+      if (this.isRelationAddFormIncomplete)
+        throw new Error(
+          `Cannot add a relation with missing values: ${JSON.stringify(
+            relation
+          )}`
+        )
+      if (relation.from === relation.to)
+        throw new Error(`Cannot add an own relation for id: ${relation.from}`)
+
+      this.heroesRelations = this.heroesRelations.filter(
+        (r) => !(r.from === relation.from && r.to === relation.to)
+      )
+      this.heroesRelations.push(relation)
+
+      this.resetRelationAddForm()
+    },
+    resetHeroeAddForm() {
+      this.heroeAddForm = {
+        name: '',
+      }
+    },
+    resetRelationAddForm() {
+      this.relationAddForm = {
+        from: null,
+        to: null,
+        type: null,
+      }
+    },
+    isText(relationType) {
+      return relationType !== HeroeRelation.NEUTRAL ? 'is an' : 'is'
+    },
+    ofText(relationType) {
+      return relationType !== HeroeRelation.NEUTRAL ? 'of' : 'to'
     },
   },
 }
@@ -218,5 +371,9 @@ ul {
 
 .card-body + .divider {
   margin-bottom: 0;
+}
+
+.select-white {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23ffffff'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E") !important;
 }
 </style>
