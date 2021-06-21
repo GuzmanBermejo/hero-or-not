@@ -1,5 +1,17 @@
 <template>
-  <main class="container">
+  <main id="list-view">
+    <section v-if="!heroes.length" class="empty">
+      <div class="empty-icon">
+        <i class="icon icon-people"></i>
+      </div>
+      <p class="empty-title h5">You have no heroes</p>
+      <p class="empty-subtitle">
+        Go ahead and add one now or
+        <button class="btn btn-link" @click="loadDefaultData">
+          load some defaults
+        </button>
+      </p>
+    </section>
     <ol>
       <li v-for="heroe in heroesSorted" :key="heroe.id" class="card">
         <header class="card-header c-hand" @click="heroeSelect(heroe)">
@@ -161,7 +173,7 @@
       </li>
       <li class="card">
         <header class="card-header">
-          <div class="input-group">
+          <div class="input-group col-12">
             <input
               v-model="heroeAddForm.name"
               class="form-input h5 card-title text-bold"
@@ -205,15 +217,45 @@ const HeroeRelationToColor = {
 export default {
   data() {
     return {
-      heroes: [
+      heroes: [],
+      heroesRelations: [],
+      heroeSelected: null,
+      heroeAddForm: {
+        name: '',
+      },
+      relationAddForm: {
+        from: null,
+        to: null,
+        type: null,
+      },
+      whiteBackgroundImage: `url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23ffffff'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E")`,
+    }
+  },
+  computed: {
+    heroesSorted() {
+      return [...this.heroes].sort((heroe1, heroe2) =>
+        collatorCompare(heroe1.name, heroe2.name)
+      )
+    },
+    isRelationAddFormIncomplete() {
+      return Object.values(this.relationAddForm).includes(null)
+    },
+  },
+  created() {
+    this.HeroeRelation = HeroeRelation
+    this.HeroeRelationToColor = HeroeRelationToColor
+  },
+  methods: {
+    loadDefaultData() {
+      this.heroes = [
         {
           id: '0',
           name: 'Batman',
         },
         { id: '1', name: 'Robin' },
         { id: '2', name: 'The Joker' },
-      ],
-      heroesRelations: [
+      ]
+      this.heroesRelations = [
         {
           from: '0',
           to: '1',
@@ -244,34 +286,8 @@ export default {
           to: '1',
           type: HeroeRelation.ARCHENEMY,
         },
-      ],
-      heroeSelected: null,
-      heroeAddForm: {
-        name: '',
-      },
-      relationAddForm: {
-        from: null,
-        to: null,
-        type: null,
-      },
-      whiteBackgroundImage: `url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23ffffff'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E")`,
-    }
-  },
-  computed: {
-    heroesSorted() {
-      return [...this.heroes].sort((heroe1, heroe2) =>
-        collatorCompare(heroe1.name, heroe2.name)
-      )
+      ]
     },
-    isRelationAddFormIncomplete() {
-      return Object.values(this.relationAddForm).includes(null)
-    },
-  },
-  created() {
-    this.HeroeRelation = HeroeRelation
-    this.HeroeRelationToColor = HeroeRelationToColor
-  },
-  methods: {
     getHeroe(id) {
       return this.heroes.find((h) => h.id === id)
     },
@@ -368,7 +384,7 @@ export default {
   font-weight: bold;
 }
 
-.container {
+#list-view {
   margin: 0 auto;
   min-height: 100vh;
   max-width: 600px;
@@ -402,5 +418,14 @@ ul {
 
 .select-white {
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23ffffff'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E") !important;
+}
+
+.empty {
+  margin: 1rem 0 3rem 0;
+}
+
+.empty-subtitle button {
+  vertical-align: baseline;
+  padding-left: 0;
 }
 </style>
