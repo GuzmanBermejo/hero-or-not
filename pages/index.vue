@@ -37,6 +37,12 @@ function createHeroId() {
 
 const collatorCompare = new Intl.Collator('en').compare
 
+const HeroeRelation = Object.freeze({
+  ALLY: 'ally',
+  NEUTRAL: 'neutral',
+  ARCHENEMY: 'archenemy',
+})
+
 export default {
   data() {
     return {
@@ -47,6 +53,38 @@ export default {
         },
         { id: '1', name: 'Robin' },
         { id: '2', name: 'The Joker' },
+      ],
+      heroesRelations: [
+        {
+          from: '0',
+          to: '1',
+          type: HeroeRelation.ALLY,
+        },
+        {
+          from: '1',
+          to: '0',
+          type: HeroeRelation.NEUTRAL,
+        },
+        {
+          from: '0',
+          to: '2',
+          type: HeroeRelation.ARCHENEMY,
+        },
+        {
+          from: '2',
+          to: '0',
+          type: HeroeRelation.ARCHENEMY,
+        },
+        {
+          from: '1',
+          to: '2',
+          type: HeroeRelation.ARCHENEMY,
+        },
+        {
+          from: '2',
+          to: '1',
+          type: HeroeRelation.ARCHENEMY,
+        },
       ],
       heroeAddForm: {
         name: '',
