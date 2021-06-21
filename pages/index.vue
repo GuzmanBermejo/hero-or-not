@@ -1,15 +1,26 @@
 <template>
   <div class="container">
     <ol>
-      <li>Batman</li>
-      <li>Robin</li>
-      <li>The Joker</li>
+      <li v-for="heroe in heroes" :key="heroe.id">{{ heroe.name }}</li>
     </ol>
   </div>
 </template>
 
 <script>
-export default {}
+export default {
+  data() {
+    return {
+      heroes: [
+        {
+          id: '0',
+          name: 'Batman',
+        },
+        { id: '1', name: 'Robin' },
+        { id: '2', name: 'The Joker' },
+      ],
+    }
+  },
+}
 </script>
 
 <style>
