@@ -413,7 +413,7 @@ export default {
 
 #hero-add {
   position: absolute;
-  bottom: 1rem;
+  bottom: 2rem;
   right: 1rem;
 }
 
