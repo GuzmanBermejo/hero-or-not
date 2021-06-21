@@ -23,9 +23,22 @@
   margin: 0;
 }
 
+html,
+body,
+#wrapper,
+#__nuxt,
+#__layout {
+  height: 100%;
+}
+#wrapper {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+}
+
 #wrapper > * {
-  margin: 0 auto;
   max-width: 960px;
+  width: 100%;
 }
 
 /* @media (min-width: 960px) {
@@ -40,7 +53,9 @@
 }
 #content {
   background: white;
-  padding-top: 2rem;
   width: 100%;
+  flex-grow: 1;
+
+  /* padding-top: 2rem; */
 }
 </style>
