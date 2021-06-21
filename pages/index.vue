@@ -2,10 +2,16 @@
   <main class="container">
     <ol>
       <li v-for="heroe in heroesSorted" :key="heroe.id" class="card">
-        <header class="card-header c-hand">
+        <header class="card-header c-hand" @click="heroeSelect(heroe)">
           <h5 class="card-title text-bold text-ellipsis">{{ heroe.name }}</h5>
+          <i
+            class="icon text-primary"
+            :class="[
+              heroe === heroeSelected ? 'icon-arrow-up' : 'icon-arrow-down',
+            ]"
+          ></i>
         </header>
-        <section class="card-body">
+        <section v-if="heroe === heroeSelected" class="card-body">
           <h6 class="chip">Relations</h6>
           <ul>
             <li
@@ -124,6 +130,7 @@ export default {
           type: HeroeRelation.ARCHENEMY,
         },
       ],
+      heroeSelected: null,
       heroeAddForm: {
         name: '',
       },
@@ -149,6 +156,9 @@ export default {
         (relation) => relation.to === heroe.id || relation.from === heroe.id
       )
     },
+    heroeSelect(heroe) {
+      this.heroeSelected = this.heroeSelected !== heroe ? heroe : null
+    },
     heroeAdd() {
       const heroe = {
         id: createHeroId(),
@@ -157,12 +167,18 @@ export default {
       this.heroes.push(heroe)
 
       this.heroeAddForm.name = ''
+
+      this.heroeSelect(heroe)
     },
   },
 }
 </script>
 
 <style>
+.bold {
+  font-weight: bold;
+}
+
 .container {
   margin: 0 auto;
   min-height: 100vh;
@@ -171,9 +187,13 @@ export default {
 ol {
   margin: 0;
 }
-.bold {
-  font-weight: bold;
+header {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
 }
+
 ul {
   list-style-position: outside;
 }
