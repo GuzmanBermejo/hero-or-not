@@ -356,8 +356,8 @@ export default {
     isText(relationType) {
       return relationType !== HeroeRelation.NEUTRAL ? 'is an' : 'is'
     },
-    ofText(relationType) {
-      return relationType !== HeroeRelation.NEUTRAL ? 'of' : 'to'
+    ofText(_) {
+      return 'to'
     },
   },
 }
