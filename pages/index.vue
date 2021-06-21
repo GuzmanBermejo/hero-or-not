@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <main class="container">
     <ol>
       <li v-for="heroe in heroes" :key="heroe.id" class="card">
         <header class="card-header c-hand">
@@ -26,7 +26,7 @@
         </header>
       </li>
     </ol>
-  </div>
+  </main>
 </template>
 
 <script>
