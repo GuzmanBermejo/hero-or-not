@@ -12,7 +12,7 @@
           ></i>
         </header>
         <section v-if="heroe === heroeSelected" class="card-body">
-          <h6 class="chip">Relations</h6>
+          <h6 class="p-2 chip bg-dark">Relations</h6>
           <ul>
             <li
               v-for="relation in getHeroeRelations(heroe)"
@@ -25,7 +25,7 @@
               >
               <span> is </span>
               <span
-                class="p-1"
+                class="p-2 chip"
                 :style="{
                   background: HeroeRelationToColor[relation.type],
                   color: '#fff',
