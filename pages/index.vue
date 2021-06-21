@@ -5,6 +5,38 @@
         <header class="card-header c-hand">
           <h5 class="card-title text-bold text-ellipsis">{{ heroe.name }}</h5>
         </header>
+        <section class="card-body">
+          <h6 class="chip">Relations</h6>
+          <ul>
+            <li
+              v-for="relation in getHeroeRelations(heroe)"
+              :key="`${relation.from}->${relation.to}`"
+            >
+              <span
+                class="text-ellipsis"
+                :class="{ bold: relation.from !== heroe.id }"
+                >{{ getHeroe(relation.from).name }}</span
+              >
+              <span> is </span>
+              <span
+                class="p-1"
+                :style="{
+                  background: HeroeRelationToColor[relation.type],
+                  color: '#fff',
+                }"
+                >{{ relation.type }}</span
+              >
+              <span>
+                {{ relation.type !== HeroeRelation.NEUTRAL ? 'of' : 'to' }}
+              </span>
+              <span
+                class="text-ellipsis"
+                :class="{ bold: relation.to !== heroe.id }"
+                >{{ getHeroe(relation.to).name }}</span
+              >
+            </li>
+          </ul>
+        </section>
       </li>
       <li class="card">
         <header class="card-header">
@@ -42,6 +74,12 @@ const HeroeRelation = Object.freeze({
   NEUTRAL: 'neutral',
   ARCHENEMY: 'archenemy',
 })
+
+const HeroeRelationToColor = {
+  [HeroeRelation.ALLY]: '#32b643',
+  [HeroeRelation.NEUTRAL]: '#66758c',
+  [HeroeRelation.ARCHENEMY]: '#e85600',
+}
 
 export default {
   data() {
@@ -98,7 +136,19 @@ export default {
       )
     },
   },
+  created() {
+    this.HeroeRelation = HeroeRelation
+    this.HeroeRelationToColor = HeroeRelationToColor
+  },
   methods: {
+    getHeroe(id) {
+      return this.heroes.find((h) => h.id === id)
+    },
+    getHeroeRelations(heroe) {
+      return this.heroesRelations.filter(
+        (relation) => relation.to === heroe.id || relation.from === heroe.id
+      )
+    },
     heroeAdd() {
       const heroe = {
         id: createHeroId(),
@@ -120,5 +170,11 @@ export default {
 }
 ol {
   margin: 0;
+}
+.bold {
+  font-weight: bold;
+}
+ul {
+  list-style-position: outside;
 }
 </style>
