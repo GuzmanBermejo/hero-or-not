@@ -10,11 +10,16 @@
         <header class="card-header">
           <div class="input-group">
             <input
+              v-model="heroeAddForm.name"
               class="form-input h5 card-title text-bold"
               type="text"
               placeholder="Name of heroe"
             />
-            <button class="btn btn-primary input-group-btn">
+            <button
+              class="btn btn-primary input-group-btn"
+              :class="{ disabled: !heroeAddForm.name.length }"
+              @click="heroeAdd"
+            >
               <i class="icon icon-people"></i>+ Add
             </button>
           </div>
@@ -25,6 +30,10 @@
 </template>
 
 <script>
+function createHeroId() {
+  // TODO replace by something like UUID 4
+  return Math.floor(Math.random() * 99999).toString()
+}
 export default {
   data() {
     return {
@@ -36,7 +45,21 @@ export default {
         { id: '1', name: 'Robin' },
         { id: '2', name: 'The Joker' },
       ],
+      heroeAddForm: {
+        name: '',
+      },
     }
+  },
+  methods: {
+    heroeAdd() {
+      const heroe = {
+        id: createHeroId(),
+        name: this.heroeAddForm.name,
+      }
+      this.heroes.push(heroe)
+
+      this.heroeAddForm.name = ''
+    },
   },
 }
 </script>
