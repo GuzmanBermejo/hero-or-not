@@ -1,8 +1,8 @@
-# Hero or not
+# 🦸 Hero or not 🦹
 
 Small webapp where users can define superheroes and their relationships
 
-For some documentation check out the pages of [this Figma file](https://www.figma.com/file/oxdFdBRGnDL1oPYH0o9YVW/Hero-or-not?node-id=0%3A1).
+For some documentation check out the pages of [this Figma file](https://www.figma.com/file/oxdFdBRGnDL1oPYH0o9YVW/%F0%9F%A6%B8-Hero-or-not-%F0%9F%A6%B9?node-id=0%3A1).
 
 ## Build Setup
 

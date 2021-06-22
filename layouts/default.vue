@@ -12,14 +12,14 @@
             to="/"
             class="btn btn-sm"
             :class="{ 'btn-success': 'index' === currentRouteName }"
-            ><i class="icon icon-menu"></i> Lista</NuxtLink
+            ><i class="icon icon-menu"></i> List</NuxtLink
           >
           <NuxtLink
             to="/graph"
             class="btn btn-sm"
             :class="{ 'btn-success': 'graph' === currentRouteName }"
-            >Grafo<i class="icon icon-location"></i
-          ></NuxtLink>
+            ><i class="icon icon-location"></i>Graph</NuxtLink
+          >
         </nav>
       </div>
     </header>
