@@ -42,8 +42,8 @@
               >
                 <span
                   class="text-ellipsis"
-                  :class="{ bold: relation.from !== hero.id }"
-                  >{{ getHero(relation.from).name }}</span
+                  :class="{ bold: relation.to !== hero.id }"
+                  >{{ getHero(relation.to).name }}</span
                 >
                 <span> {{ isText(relation.type) }} </span>
                 <span
@@ -59,8 +59,8 @@
                 </span>
                 <span
                   class="text-ellipsis"
-                  :class="{ bold: relation.to !== hero.id }"
-                  >{{ getHero(relation.to).name }}</span
+                  :class="{ bold: relation.from !== hero.id }"
+                  >{{ getHero(relation.from).name }}</span
                 >
               </li>
             </ul>
@@ -68,7 +68,10 @@
           <div class="divider"></div>
           <footer class="card-footer">
             <div>
-              <a href="#relation-modal" class="btn btn-sm"
+              <a
+                href="#relation-modal"
+                class="btn btn-sm"
+                @click="relationAddForm.from = hero.id"
                 ><i class="icon icon-resize-horiz"></i> Add relation</a
               >
               <div id="relation-modal" class="modal modal-sm">
@@ -91,19 +94,19 @@
                       <div class="form-group">
                         <label class="form-label">Hero</label>
                         <select
-                          v-model="relationAddForm.from"
+                          v-model="relationAddForm.to"
                           class="form-select"
                         >
                           <option disabled value="">Select a hero</option>
                           <option
-                            v-for="heroFrom in heroesSorted.filter(
-                              (h) => h.id !== relationAddForm.to
+                            v-for="heroTo in heroesSorted.filter(
+                              (h) => h.id !== relationAddForm.from
                             )"
-                            :key="heroFrom.id"
-                            :value="heroFrom.id"
+                            :key="heroTo.id"
+                            :value="heroTo.id"
                             class="text-ellipsis"
                           >
-                            {{ heroFrom.name }}
+                            {{ heroTo.name }}
                           </option>
                         </select>
                       </div>
@@ -141,19 +144,19 @@
                           ofText(relationAddForm.type)
                         }}</label>
                         <select
-                          v-model="relationAddForm.to"
+                          v-model="relationAddForm.from"
                           class="form-select"
                         >
                           <option disabled value="">Select a hero</option>
                           <option
-                            v-for="heroTo in heroesSorted.filter(
-                              (h) => h.id !== relationAddForm.from
+                            v-for="heroFrom in heroesSorted.filter(
+                              (h) => h.id !== relationAddForm.to
                             )"
-                            :key="heroTo.id"
-                            :value="heroTo.id"
+                            :key="heroFrom.id"
+                            :value="heroFrom.id"
                             class="text-ellipsis"
                           >
-                            {{ heroTo.name }}
+                            {{ heroFrom.name }}
                           </option>
                         </select>
                       </div>
@@ -267,10 +270,10 @@ export default {
         if (isFromEqual && relation1.from === hero.id)
           collatorCompare(relation1.to, relation2.to)
 
-        if (relation1.to === hero.id) return -1
-        else if (relation2.to === hero.id) return 1
-        else if (relation1.from === hero.id) return 1
-        else if (relation2.from === hero.id) return -1
+        if (relation1.to === hero.id) return 1
+        else if (relation2.to === hero.id) return -1
+        else if (relation1.from === hero.id) return -1
+        else if (relation2.from === hero.id) return 1
 
         return (
           collatorCompare(relation1.from, relation2.from) +
@@ -329,7 +332,7 @@ export default {
       return relationType !== HeroRelation.NEUTRAL ? 'is an' : 'is'
     },
     ofText(_) {
-      return 'to'
+      return 'for'
     },
     loadDefaultData() {
       this.heroes = [...defaultHeroes]
