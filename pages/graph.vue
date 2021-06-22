@@ -487,7 +487,6 @@ export default {
 .graph-view {
   height: 100%;
   padding: 0;
-  background-color: turquoise;
   position: relative;
 }
 
@@ -511,6 +510,7 @@ export default {
   flex-flow: column nowrap;
   align-items: flex-start;
   padding: 0.2rem;
+  background-color: #f7f8f9;
 }
 
 #hero-add {
