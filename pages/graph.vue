@@ -108,8 +108,12 @@
       </button>
     </aside>
     <aside id="hero-add" class="card">
-      <button v-if="!heroes.length" class="btn btn-link">
-        Add default heroes
+      <button
+        v-if="!heroes.length"
+        class="btn btn-link"
+        @click="loadDefaultData"
+      >
+        Load default heroes
       </button>
 
       <header class="card-header">
@@ -224,48 +228,8 @@ export default {
       d3Svg: null,
       d3Zoom: null,
       d3G: null,
-      heroes: [
-        {
-          id: '0',
-          name: 'Batman',
-          x: 0.2,
-          y: 0.3,
-        },
-        { id: '1', name: 'Robin', x: 0.8, y: 0.3 },
-        { id: '2', name: 'The Joker', x: 0.5, y: 0.7 },
-      ],
-      heroesRelations: [
-        {
-          from: '0',
-          to: '1',
-          type: HeroeRelation.ALLY,
-        },
-        {
-          from: '1',
-          to: '0',
-          type: HeroeRelation.NEUTRAL,
-        },
-        {
-          from: '0',
-          to: '2',
-          type: HeroeRelation.ARCHENEMY,
-        },
-        {
-          from: '2',
-          to: '0',
-          type: HeroeRelation.ARCHENEMY,
-        },
-        {
-          from: '1',
-          to: '2',
-          type: HeroeRelation.ARCHENEMY,
-        },
-        {
-          from: '2',
-          to: '1',
-          type: HeroeRelation.ARCHENEMY,
-        },
-      ],
+      heroes: [],
+      heroesRelations: [],
       heroeSelected: null,
       heroAddForm: {
         name: '',
@@ -478,6 +442,51 @@ export default {
         to: null,
         type: null,
       }
+    },
+    loadDefaultData() {
+      this.heroes = [
+        {
+          id: '0',
+          name: 'Batman',
+          x: 0.2,
+          y: 0.3,
+        },
+        { id: '1', name: 'Robin', x: 0.8, y: 0.3 },
+        { id: '2', name: 'The Joker', x: 0.5, y: 0.7 },
+        { id: '3', name: 'Superman', x: 0.2, y: 0.7 },
+      ]
+      this.heroesRelations = [
+        {
+          from: '0',
+          to: '1',
+          type: HeroeRelation.ALLY,
+        },
+        {
+          from: '1',
+          to: '0',
+          type: HeroeRelation.NEUTRAL,
+        },
+        {
+          from: '0',
+          to: '2',
+          type: HeroeRelation.ARCHENEMY,
+        },
+        {
+          from: '2',
+          to: '0',
+          type: HeroeRelation.ARCHENEMY,
+        },
+        {
+          from: '1',
+          to: '2',
+          type: HeroeRelation.ARCHENEMY,
+        },
+        {
+          from: '2',
+          to: '1',
+          type: HeroeRelation.ARCHENEMY,
+        },
+      ]
     },
   },
 }
