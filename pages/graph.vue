@@ -7,6 +7,10 @@
         preserveAspectRatio="xMidYMid meet"
         :height="height"
         :width="width"
+        @mousemove="
+          relationAddForm.from && relationAddForm.type && mouseMove($event)
+        "
+        @click="relationAddForm.from && mouseClick()"
       >
         <!-- https://observablehq.com/@d3/mobile-patent-suits -->
         <marker
@@ -26,7 +30,7 @@
           ></path>
         </marker>
         <g>
-          <rect width="1" height="1" fill="darkslateblue" />
+          <rect width="1" height="1" fill="white" />
           <path
             v-for="relation in heroesRelations"
             :key="JSON.stringify(relation)"
@@ -36,16 +40,30 @@
             stroke-width="0.005"
             fill="none"
           ></path>
+
+          <path
+            v-if="relationAddForm.from && cursor"
+            :d="linkArc(getHeroe(relationAddForm.from), cursor)"
+            :stroke="HeroeRelationToColor[relationAddForm.type]"
+            :marker-end="`url(#arrow-${relationAddForm.type}`"
+            stroke-width="0.005"
+            fill="none"
+          ></path>
+
           <g
             v-for="hero in heroes"
             :key="hero.id"
-            class="hero-node c-move"
+            class="hero-node"
+            :class="[relationAddForm.from && cursor ? 'c-hand' : 'c-move']"
             :hero-id="hero.id"
+            @click.stop="
+              relationAddForm.from && cursor && clickNode(hero, $event)
+            "
           >
-            <circle :cx="hero.x" :cy="hero.y" fill="white" r="0.012"></circle>
+            <circle :cx="hero.x" :cy="hero.y" fill="#303742" r="0.012"></circle>
             <text
               text-anchor="middle"
-              fill="white"
+              fill="#303742"
               class="bold"
               :x="hero.x"
               :y="hero.y - (0.012 + 0.01)"
@@ -55,19 +73,28 @@
             >
               {{ hero.name }}
             </text>
-            <text
+            <!-- Plus arrow by Roundicons.com from the Noun Project -->
+            <g
+              v-if="!(relationAddForm.from && relationAddForm.type)"
+              :transform="`translate(${hero.x - 0.025},${
+                hero.y + 0.015
+              }) scale(0.02)`"
               class="c-hand"
-              text-anchor="middle"
-              fill="white"
-              :x="hero.x"
-              :y="hero.y + (0.012 + 0.03)"
-              :style="{
-                fontSize: 0.002 + 'rem',
-              }"
-              @click.stop="clickNode(hero)"
+              @click.stop="clickNode(hero, $event)"
             >
-              +
-            </text>
+              <path
+                d="M0.587096 1.38101L0.587096 0.323995C0.587096 0.230134 0.666033 0.125061 0.771636 0.125061L1.6904 0.125061C1.796 0.125061 1.87494 0.230134 1.87494 0.323995L1.87494 1.38101C1.87494 1.42821 1.85388 1.47555 1.81706 1.51086L1.35503 1.95001C1.28511 2.01668 1.17556 2.01668 1.10572 1.94994L0.645048 1.51101C0.608156 1.47555 0.587096 1.42821 0.587096 1.38101Z"
+                fill="#5755D9"
+              />
+              <path
+                d="M0.85224 0.844736C0.85224 0.823827 0.869209 0.806858 0.890117 0.806858L1.57192 0.806858C1.59283 0.806858 1.60979 0.823827 1.60979 0.844736C1.60979 0.865644 1.59283 0.882614 1.57192 0.882614L0.890117 0.882614C0.869209 0.882614 0.85224 0.865644 0.85224 0.844736Z"
+                fill="white"
+              />
+              <path
+                d="M1.19314 1.18563L1.19314 0.503835C1.19314 0.482927 1.21011 0.465958 1.23102 0.465958C1.25193 0.465958 1.26889 0.482927 1.26889 0.503835L1.26889 1.18563C1.26889 1.20654 1.25193 1.22351 1.23102 1.22351C1.21011 1.22351 1.19314 1.20654 1.19314 1.18563Z"
+                fill="white"
+              />
+            </g>
           </g>
         </g>
       </svg>
@@ -110,6 +137,43 @@
         }"
         >{{ relationType }}</span
       >
+    </aside>
+    <aside
+      v-if="relationAddForm.from && relationAddForm.type === null"
+      id="relation-add"
+      :style="relationAddStyle"
+      class="accordion card"
+    >
+      <input
+        id="accordion"
+        type="checkbox"
+        name="accordion-checkbox"
+        hidden=""
+        checked=""
+      />
+      <label class="accordion-header c-hand" for="accordion"
+        >New relation</label
+      >
+      <div class="accordion-body">
+        <ul class="menu menu-nav">
+          <li
+            v-for="[relationId, relationType] in Object.entries(HeroeRelation)"
+            :key="relationId"
+            class="menu-item"
+          >
+            <button
+              class="btn btn-sm"
+              :style="{
+                color: HeroeRelationToColor[relationType],
+                'border-color': HeroeRelationToColor[relationType],
+              }"
+              @click="relationAddForm.type = relationType"
+            >
+              {{ relationType }}
+            </button>
+          </li>
+        </ul>
+      </div>
     </aside>
   </main>
 </template>
@@ -207,7 +271,8 @@ export default {
         to: null,
         type: null,
       },
-      whiteBackgroundImage: `url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23ffffff'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E")`,
+      relationAddStyle: {},
+      cursor: null,
     }
   },
   computed: {
@@ -315,16 +380,49 @@ export default {
     zoomOut() {
       this.zoomBy(0.8)
     },
-    linkArc(point1, point2) {
+    linkArc(from, to) {
       // https://observablehq.com/@d3/mobile-patent-suits
-      const r = Math.hypot(point1.x - point2.x, point1.y - point2.y)
+      const r = Math.hypot(to.x - from.x, to.y - from.y)
       return `
-    M${point2.x},${point2.y}
-    A${r},${r} 0 0,1 ${point1.x},${point1.y}
+    M${from.x},${from.y}
+    A${r},${r} 0 0,1 ${to.x},${to.y}
   `
     },
-    clickNode(hero) {
-      console.log(hero)
+    clickNode(hero, event) {
+      if (
+        this.relationAddForm.from &&
+        this.relationAddForm.type &&
+        hero.id !== this.relationAddForm.from
+      ) {
+        this.relationAddForm.to = hero.id
+        this.relationAdd()
+        this.resetCursor()
+      } else if (
+        !this.relationAddForm.from ||
+        (hero.id !== this.relationAddForm.from && !this.relationAddForm.type)
+      ) {
+        this.relationAddStyle = {
+          top: `${event.clientY}px`,
+          left: `${event.clientX}px`,
+        }
+        this.relationAddForm.from = hero.id
+      } else {
+        this.resetRelationAddForm()
+        this.resetCursor()
+      }
+
+      this.updateNextTick()
+    },
+    mouseMove(event) {
+      const [x, y] = d3.pointer(event, this.d3G.node())
+      this.cursor = { x, y }
+    },
+    mouseClick() {
+      this.resetRelationAddForm()
+      this.resetCursor()
+    },
+    resetCursor() {
+      this.cursor = null
     },
     getHeroe(id) {
       return this.heroes.find((h) => h.id === id)
@@ -395,7 +493,6 @@ export default {
         (r) => !(r.from === relation.from && r.to === relation.to)
       )
       this.heroesRelations.push(relation)
-
       this.resetRelationAddForm()
     },
     resetHeroAddForm() {
@@ -444,12 +541,6 @@ export default {
   flex-flow: column nowrap;
 }
 
-#hero-add {
-  position: absolute;
-  bottom: 2rem;
-  right: 1rem;
-}
-
 #relation-legend {
   position: absolute;
   top: 1rem;
@@ -458,6 +549,19 @@ export default {
   flex-flow: column nowrap;
   align-items: flex-start;
   padding: 0.2rem;
+}
+
+#hero-add {
+  position: absolute;
+  bottom: 2rem;
+  right: 1rem;
+}
+
+#relation-add {
+  position: absolute;
+  z-index: 1;
+  transform: translate(-50%, -33%);
+  border-color: #5755d9;
 }
 
 /* .bold {
