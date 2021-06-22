@@ -1,5 +1,5 @@
 <template>
-  <main class="graph-view">
+  <main id="graph-view">
     <div id="svg-container" ref="svg-container">
       <svg
         ref="svg"
@@ -497,7 +497,7 @@ export default {
   font-weight: bold;
 }
 
-.graph-view {
+#graph-view {
   height: 100%;
   padding: 0;
   position: relative;
