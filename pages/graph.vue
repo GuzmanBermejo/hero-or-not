@@ -346,7 +346,7 @@ export default {
 
       const that = this
       function dragged(event) {
-        const hero = that.getHeroe(this.getAttribute('hero-id'))
+        const hero = that.getHeroe(this.parentNode.getAttribute('hero-id'))
         hero.x = clamp(event.x)
         hero.y = clamp(event.y)
       }
@@ -356,7 +356,7 @@ export default {
       }
 
       this.d3G
-        .selectAll('.hero-node')
+        .selectAll('.hero-node text, .hero-node circle')
         .call(
           d3
             .drag()
