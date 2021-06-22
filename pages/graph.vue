@@ -187,7 +187,10 @@
 </template>
 
 <script>
-import * as d3 from 'd3'
+import { select, pointer } from 'd3-selection'
+import { zoom } from 'd3-zoom'
+import { drag } from 'd3-drag'
+import { scaleLinear } from 'd3-scale'
 
 function random(min, max) {
   return Math.random() * (max - min) + min
@@ -219,7 +222,7 @@ const HeroeRelationToColor = {
   [HeroeRelation.ARCHENEMY]: '#e85600',
 }
 
-const clamp = d3.scaleLinear().domain([0, 1]).range([0, 1]).clamp(true)
+const clamp = scaleLinear().domain([0, 1]).range([0, 1]).clamp(true)
 export default {
   data() {
     return {
@@ -274,7 +277,7 @@ export default {
         this.height = height
         this.width = width
 
-        const svg = d3.select('svg')
+        const svg = select('svg')
         this.d3Svg = svg
 
         const g = svg.select('g')
@@ -286,8 +289,7 @@ export default {
           that.update()
         }
 
-        const zoom = d3
-          .zoom()
+        const d3Zoom = zoom()
           .extent([
             [0, 0],
             [1, 1],
@@ -299,17 +301,17 @@ export default {
           ])
           .on('zoom', zoomed)
 
-        svg.call(zoom)
-        svg.call(zoom.scaleTo, 1)
+        svg.call(d3Zoom)
+        svg.call(d3Zoom.scaleTo, 1)
 
-        this.d3Zoom = zoom
+        this.d3Zoom = d3Zoom
 
         this.update()
       })
     },
     update() {
       function dragstarted() {
-        d3.select(this).raise()
+        select(this).raise()
       }
 
       const that = this
@@ -326,8 +328,7 @@ export default {
       this.d3G
         .selectAll('.hero-node text, .hero-node circle')
         .call(
-          d3
-            .drag()
+          drag()
             .on('start', dragstarted)
             .on('drag', dragged)
             .on('end', dragended)
@@ -382,7 +383,7 @@ export default {
       this.updateNextTick()
     },
     mouseMove(event) {
-      const [x, y] = d3.pointer(event, this.d3G.node())
+      const [x, y] = pointer(event, this.d3G.node())
       this.cursor = { x, y }
     },
     mouseClick() {
