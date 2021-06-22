@@ -108,6 +108,10 @@
       </button>
     </aside>
     <aside id="hero-add" class="card">
+      <button v-if="!heroes.length" class="btn btn-link">
+        Add default heroes
+      </button>
+
       <header class="card-header">
         <div class="input-group">
           <input
@@ -517,6 +521,10 @@ export default {
   position: absolute;
   bottom: 2rem;
   right: 1rem;
+}
+
+#hero-add button:first-of-type {
+  align-self: flex-end;
 }
 
 #relation-add {
