@@ -324,8 +324,8 @@ export default {
       return 'to'
     },
     loadDefaultData() {
-      this.heroes = defaultHeroes
-      this.heroRelations = defaultHeroRelations
+      this.heroes = [...defaultHeroes]
+      this.heroRelations = [...defaultHeroRelations]
     },
   },
 }
