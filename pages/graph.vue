@@ -427,38 +427,6 @@ export default {
     getHeroe(id) {
       return this.heroes.find((h) => h.id === id)
     },
-    getHeroeRelations(heroe) {
-      return this.heroesRelations.filter(
-        (relation) => relation.to === heroe.id || relation.from === heroe.id
-      )
-    },
-    getHeroeRelationsSorted(heroe) {
-      return this.getHeroeRelations(heroe).sort((relation1, relation2) => {
-        // Order by type
-        if (relation1.type !== relation2.type) {
-          const values = Object.values(HeroeRelation)
-          return values.indexOf(relation1.type) - values.indexOf(relation2.type)
-        }
-
-        const isToEqual = relation1.to === relation2.to
-        if (isToEqual && relation1.to === heroe.id)
-          collatorCompare(relation1.from, relation2.from)
-
-        const isFromEqual = relation1.from === relation2.from
-        if (isFromEqual && relation1.from === heroe.id)
-          collatorCompare(relation1.to, relation2.to)
-
-        if (relation1.to === heroe.id) return -1
-        else if (relation2.to === heroe.id) return 1
-        else if (relation1.from === heroe.id) return 1
-        else if (relation2.from === heroe.id) return -1
-
-        return (
-          collatorCompare(relation1.from, relation2.from) +
-          collatorCompare(relation1.to, relation2.to)
-        )
-      })
-    },
     heroeSelect(heroe) {
       this.heroeSelected = this.heroeSelected !== heroe ? heroe : null
 
@@ -506,12 +474,6 @@ export default {
         to: null,
         type: null,
       }
-    },
-    isText(relationType) {
-      return relationType !== HeroeRelation.NEUTRAL ? 'is an' : 'is'
-    },
-    ofText(_) {
-      return 'to'
     },
   },
 }
@@ -563,44 +525,4 @@ export default {
   transform: translate(-50%, -33%);
   border-color: #5755d9;
 }
-
-/* .bold {
-  font-weight: bold;
-}
-
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  max-width: 600px;
-}
-
-ol {
-  margin: 0;
-}
-
-header {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: space-between;
-}
-h5 {
-  margin: 0;
-}
-
-ul {
-  list-style-position: outside;
-}
-
-.card-header + .divider {
-  margin-top: 0.8rem;
-}
-
-.card-body + .divider {
-  margin-bottom: 0;
-}
-
-.select-white {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23ffffff'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E") !important;
-} */
 </style>
