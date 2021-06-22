@@ -15,7 +15,13 @@
     <ol>
       <li v-for="hero in heroesSorted" :key="hero.id" class="card">
         <header class="card-header c-hand" @click="heroSelect(hero)">
-          <h5 class="card-title text-bold text-ellipsis">{{ hero.name }}</h5>
+          <h5
+            class="card-title text-bold text-ellipsis"
+            :class="{ badge: hero !== heroSelected }"
+            :data-badge="getHeroRelationsSorted(hero).length"
+          >
+            {{ hero.name }}
+          </h5>
           <i
             class="icon text-primary"
             :class="[
@@ -26,7 +32,9 @@
         <template v-if="hero === heroSelected">
           <div class="divider"></div>
           <section class="card-body">
-            <h6 class="p-2 chip bg-dark">Relations</h6>
+            <h6 class="p-2 chip bg-dark">
+              Relations ({{ getHeroRelationsSorted(hero).length }})
+            </h6>
             <ul>
               <li
                 v-for="relation in getHeroRelationsSorted(hero)"
@@ -358,6 +366,14 @@ h5 {
 
 ul {
   list-style-position: outside;
+}
+
+.badge[data-badge]::after {
+  background-color: #303742;
+}
+
+.card-header h5 {
+  padding: 0.25rem 0;
 }
 
 .card-header + .divider {
