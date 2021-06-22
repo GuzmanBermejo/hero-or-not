@@ -7,6 +7,20 @@
             >🦸 Hero or not 🦹</a
           >
         </nav>
+        <nav class="navbar-section toggle btn-group">
+          <NuxtLink
+            to="/"
+            class="btn btn-sm"
+            :class="{ 'btn-success': 'index' === currentRouteName }"
+            ><i class="icon icon-menu"></i> Lista</NuxtLink
+          >
+          <NuxtLink
+            to="/graph"
+            class="btn btn-sm"
+            :class="{ 'btn-success': 'graph' === currentRouteName }"
+            >Grafo<i class="icon icon-location"></i
+          ></NuxtLink>
+        </nav>
       </div>
     </header>
     <div id="content">
@@ -14,6 +28,21 @@
     </div>
   </div>
 </template>
+<script>
+export default {
+  data() {
+    return { currentRouteName: null }
+  },
+  watch: {
+    $route(to) {
+      this.currentRouteName = to.name
+    },
+  },
+  created() {
+    this.currentRouteName = this?.$router?.currentRoute?.name
+  },
+}
+</script>
 
 <style>
 *,
@@ -50,6 +79,7 @@ body,
 
 .navbar {
   padding: 1rem 2rem;
+  width: 100%;
 }
 #content {
   background: white;
