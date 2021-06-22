@@ -13,35 +13,35 @@
       </p>
     </section>
     <ol>
-      <li v-for="heroe in heroesSorted" :key="heroe.id" class="card">
-        <header class="card-header c-hand" @click="heroeSelect(heroe)">
-          <h5 class="card-title text-bold text-ellipsis">{{ heroe.name }}</h5>
+      <li v-for="hero in heroesSorted" :key="hero.id" class="card">
+        <header class="card-header c-hand" @click="heroSelect(hero)">
+          <h5 class="card-title text-bold text-ellipsis">{{ hero.name }}</h5>
           <i
             class="icon text-primary"
             :class="[
-              heroe === heroeSelected ? 'icon-arrow-up' : 'icon-arrow-down',
+              hero === heroSelected ? 'icon-arrow-up' : 'icon-arrow-down',
             ]"
           ></i>
         </header>
-        <template v-if="heroe === heroeSelected">
+        <template v-if="hero === heroSelected">
           <div class="divider"></div>
           <section class="card-body">
             <h6 class="p-2 chip bg-dark">Relations</h6>
             <ul>
               <li
-                v-for="relation in getHeroeRelationsSorted(heroe)"
+                v-for="relation in getHeroRelationsSorted(hero)"
                 :key="`${relation.from}->${relation.to}`"
               >
                 <span
                   class="text-ellipsis"
-                  :class="{ bold: relation.from !== heroe.id }"
-                  >{{ getHeroe(relation.from).name }}</span
+                  :class="{ bold: relation.from !== hero.id }"
+                  >{{ getHero(relation.from).name }}</span
                 >
                 <span> {{ isText(relation.type) }} </span>
                 <span
                   class="p-2 chip"
                   :style="{
-                    background: HeroeRelationToColor[relation.type],
+                    background: HeroRelationToColor[relation.type],
                     color: '#fff',
                   }"
                   >{{ relation.type }}</span
@@ -51,8 +51,8 @@
                 </span>
                 <span
                   class="text-ellipsis"
-                  :class="{ bold: relation.to !== heroe.id }"
-                  >{{ getHeroe(relation.to).name }}</span
+                  :class="{ bold: relation.to !== hero.id }"
+                  >{{ getHero(relation.to).name }}</span
                 >
               </li>
             </ul>
@@ -81,21 +81,21 @@
                   <div class="modal-body">
                     <form>
                       <div class="form-group">
-                        <label class="form-label">Heroe</label>
+                        <label class="form-label">Hero</label>
                         <select
                           v-model="relationAddForm.from"
                           class="form-select"
                         >
-                          <option disabled value="">Select a heroe</option>
+                          <option disabled value="">Select a hero</option>
                           <option
-                            v-for="heroeFrom in heroesSorted.filter(
+                            v-for="heroFrom in heroesSorted.filter(
                               (h) => h.id !== relationAddForm.to
                             )"
-                            :key="heroeFrom.id"
-                            :value="heroeFrom.id"
+                            :key="heroFrom.id"
+                            :value="heroFrom.id"
                             class="text-ellipsis"
                           >
-                            {{ heroeFrom.name }}
+                            {{ heroFrom.name }}
                           </option>
                         </select>
                       </div>
@@ -106,15 +106,12 @@
                         <select
                           v-model="relationAddForm.type"
                           class="form-select"
-                          :class="{
-                            //'select-white': relationAddForm.type !== null,
-                          }"
                           :style="
                             relationAddForm.type !== null
                               ? {
                                   color: '#fff',
                                   'background-color':
-                                    HeroeRelationToColor[relationAddForm.type],
+                                    HeroRelationToColor[relationAddForm.type],
                                   'background-image': whiteBackgroundImage,
                                 }
                               : {}
@@ -122,7 +119,7 @@
                         >
                           <option
                             v-for="[relationId, relationType] in Object.entries(
-                              HeroeRelation
+                              HeroRelation
                             )"
                             :key="relationId"
                             :value="relationType"
@@ -139,16 +136,16 @@
                           v-model="relationAddForm.to"
                           class="form-select"
                         >
-                          <option disabled value="">Select a heroe</option>
+                          <option disabled value="">Select a hero</option>
                           <option
-                            v-for="heroeTo in heroesSorted.filter(
+                            v-for="heroTo in heroesSorted.filter(
                               (h) => h.id !== relationAddForm.from
                             )"
-                            :key="heroeTo.id"
-                            :value="heroeTo.id"
+                            :key="heroTo.id"
+                            :value="heroTo.id"
                             class="text-ellipsis"
                           >
-                            {{ heroeTo.name }}
+                            {{ heroTo.name }}
                           </option>
                         </select>
                       </div>
@@ -175,15 +172,15 @@
         <header class="card-header">
           <div class="input-group col-12">
             <input
-              v-model="heroeAddForm.name"
+              v-model="heroAddForm.name"
               class="form-input h5 card-title text-bold"
               type="text"
-              placeholder="Name of heroe"
+              placeholder="Name of hero"
             />
             <button
               class="btn btn-primary input-group-btn"
-              :class="{ disabled: !heroeAddForm.name.length }"
-              @click="heroeAdd"
+              :class="{ disabled: !heroAddForm.name.length }"
+              @click="heroAdd"
             >
               <i class="icon icon-people"></i>+ Add
             </button>
@@ -195,32 +192,24 @@
 </template>
 
 <script>
-function createHeroId() {
-  // TODO replace by something like UUID 4
-  return Math.floor(Math.random() * 99999).toString()
-}
+import { createHero } from '~/js/utils'
+import {
+  HeroRelation,
+  HeroRelationToColor,
+  defaultHeroes,
+  defaultHeroRelations,
+} from '~/js/constants'
 
 const collatorCompare = new Intl.Collator('en').compare
-
-const HeroeRelation = Object.freeze({
-  ALLY: 'ally',
-  NEUTRAL: 'neutral',
-  ARCHENEMY: 'archenemy',
-})
-
-const HeroeRelationToColor = {
-  [HeroeRelation.ALLY]: '#32b643',
-  [HeroeRelation.NEUTRAL]: '#66758c',
-  [HeroeRelation.ARCHENEMY]: '#e85600',
-}
+const whiteBackgroundImage = `url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23ffffff'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E")`
 
 export default {
   data() {
     return {
       heroes: [],
-      heroesRelations: [],
-      heroeSelected: null,
-      heroeAddForm: {
+      heroRelations: [],
+      heroSelected: null,
+      heroAddForm: {
         name: '',
       },
       relationAddForm: {
@@ -228,13 +217,12 @@ export default {
         to: null,
         type: null,
       },
-      whiteBackgroundImage: `url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23ffffff'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E")`,
     }
   },
   computed: {
     heroesSorted() {
-      return [...this.heroes].sort((heroe1, heroe2) =>
-        collatorCompare(heroe1.name, heroe2.name)
+      return [...this.heroes].sort((hero1, hero2) =>
+        collatorCompare(hero1.name, hero2.name)
       )
     },
     isRelationAddFormIncomplete() {
@@ -242,80 +230,39 @@ export default {
     },
   },
   created() {
-    this.HeroeRelation = HeroeRelation
-    this.HeroeRelationToColor = HeroeRelationToColor
+    this.HeroRelation = HeroRelation
+    this.HeroRelationToColor = HeroRelationToColor
+    this.whiteBackgroundImage = whiteBackgroundImage
   },
   methods: {
-    loadDefaultData() {
-      this.heroes = [
-        {
-          id: '0',
-          name: 'Batman',
-        },
-        { id: '1', name: 'Robin' },
-        { id: '2', name: 'The Joker' },
-      ]
-      this.heroesRelations = [
-        {
-          from: '0',
-          to: '1',
-          type: HeroeRelation.ALLY,
-        },
-        {
-          from: '1',
-          to: '0',
-          type: HeroeRelation.NEUTRAL,
-        },
-        {
-          from: '0',
-          to: '2',
-          type: HeroeRelation.ARCHENEMY,
-        },
-        {
-          from: '2',
-          to: '0',
-          type: HeroeRelation.ARCHENEMY,
-        },
-        {
-          from: '1',
-          to: '2',
-          type: HeroeRelation.ARCHENEMY,
-        },
-        {
-          from: '2',
-          to: '1',
-          type: HeroeRelation.ARCHENEMY,
-        },
-      ]
+    getHero(id) {
+      return this.heroes.find((hero) => hero.id === id)
     },
-    getHeroe(id) {
-      return this.heroes.find((h) => h.id === id)
-    },
-    getHeroeRelations(heroe) {
-      return this.heroesRelations.filter(
-        (relation) => relation.to === heroe.id || relation.from === heroe.id
+    getHeroRelations(hero) {
+      return this.heroRelations.filter(
+        (relation) => relation.to === hero.id || relation.from === hero.id
       )
     },
-    getHeroeRelationsSorted(heroe) {
-      return this.getHeroeRelations(heroe).sort((relation1, relation2) => {
+    getHeroRelationsSorted(hero) {
+      return this.getHeroRelations(hero).sort((relation1, relation2) => {
         // Order by type
         if (relation1.type !== relation2.type) {
-          const values = Object.values(HeroeRelation)
+          const values = Object.values(HeroRelation)
           return values.indexOf(relation1.type) - values.indexOf(relation2.type)
         }
 
         const isToEqual = relation1.to === relation2.to
-        if (isToEqual && relation1.to === heroe.id)
+        if (isToEqual && relation1.to === hero.id)
           collatorCompare(relation1.from, relation2.from)
 
         const isFromEqual = relation1.from === relation2.from
-        if (isFromEqual && relation1.from === heroe.id)
+        if (isFromEqual && relation1.from === hero.id)
           collatorCompare(relation1.to, relation2.to)
 
-        if (relation1.to === heroe.id) return -1
-        else if (relation2.to === heroe.id) return 1
-        else if (relation1.from === heroe.id) return 1
-        else if (relation2.from === heroe.id) return -1
+        if (relation1.to === hero.id) return -1
+        else if (relation2.to === hero.id) return 1
+        else if (relation1.from === hero.id) return 1
+        else if (relation2.from === hero.id) return -1
 
         return (
           collatorCompare(relation1.from, relation2.from) +
@@ -323,42 +270,43 @@ export default {
         )
       })
     },
-    heroeSelect(heroe) {
-      this.heroeSelected = this.heroeSelected !== heroe ? heroe : null
+    heroSelect(hero) {
+      this.heroSelected = this.heroSelected !== hero ? hero : null
 
-      this.resetHeroeAddForm()
+      this.resetHeroAddForm()
       this.resetRelationAddForm()
     },
-    heroeAdd() {
-      const heroe = {
-        id: createHeroId(),
-        name: this.heroeAddForm.name,
-      }
-      this.heroes.push(heroe)
+    heroAdd() {
+      const hero = createHero(this.heroAddForm.name)
+      this.heroes.push(hero)
 
-      this.heroeSelect(heroe)
+      this.resetHeroAddForm()
+
+      this.heroSelect(hero)
     },
     relationAdd() {
       const relation = this.relationAddForm
 
       if (this.isRelationAddFormIncomplete)
+        // TODO show error on UI
         throw new Error(
           `Cannot add a relation with missing values: ${JSON.stringify(
             relation
           )}`
         )
       if (relation.from === relation.to)
+        // TODO show error on UI
         throw new Error(`Cannot add an own relation for id: ${relation.from}`)
 
-      this.heroesRelations = this.heroesRelations.filter(
+      this.heroRelations = this.heroRelations.filter(
         (r) => !(r.from === relation.from && r.to === relation.to)
       )
-      this.heroesRelations.push(relation)
+      this.heroRelations.push(relation)
 
       this.resetRelationAddForm()
     },
-    resetHeroeAddForm() {
-      this.heroeAddForm = {
+    resetHeroAddForm() {
+      this.heroAddForm = {
         name: '',
       }
     },
@@ -370,10 +318,14 @@ export default {
       }
     },
     isText(relationType) {
-      return relationType !== HeroeRelation.NEUTRAL ? 'is an' : 'is'
+      return relationType !== HeroRelation.NEUTRAL ? 'is an' : 'is'
     },
     ofText(_) {
       return 'to'
+    },
+    loadDefaultData() {
+      this.heroes = defaultHeroes
+      this.heroRelations = defaultHeroRelations
     },
   },
 }
@@ -414,10 +366,6 @@ ul {
 
 .card-body + .divider {
   margin-bottom: 0;
-}
-
-.select-white {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23ffffff'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E") !important;
 }
 
 .empty {

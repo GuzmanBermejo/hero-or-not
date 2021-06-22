@@ -14,7 +14,7 @@
       >
         <!-- https://observablehq.com/@d3/mobile-patent-suits -->
         <marker
-          v-for="[relationId, relationType] in Object.entries(HeroeRelation)"
+          v-for="[relationId, relationType] in Object.entries(HeroRelation)"
           :id="`arrow-${relationType}`"
           :key="relationId"
           viewBox="0 -5 10 10"
@@ -25,17 +25,17 @@
           orient="auto"
         >
           <path
-            :fill="HeroeRelationToColor[relationType]"
+            :fill="HeroRelationToColor[relationType]"
             d="M0,-5L10,0L0,5"
           ></path>
         </marker>
         <g>
           <rect width="1" height="1" fill="white" />
           <path
-            v-for="relation in heroesRelations"
+            v-for="relation in heroRelations"
             :key="JSON.stringify(relation)"
-            :d="linkArc(getHeroe(relation.from), getHeroe(relation.to))"
-            :stroke="HeroeRelationToColor[relation.type]"
+            :d="linkArc(getHero(relation.from), getHero(relation.to))"
+            :stroke="HeroRelationToColor[relation.type]"
             :marker-end="`url(#arrow-${relation.type}`"
             stroke-width="0.005"
             fill="none"
@@ -43,8 +43,8 @@
 
           <path
             v-if="relationAddForm.from && cursor"
-            :d="linkArc(getHeroe(relationAddForm.from), cursor)"
-            :stroke="HeroeRelationToColor[relationAddForm.type]"
+            :d="linkArc(getHero(relationAddForm.from), cursor)"
+            :stroke="HeroRelationToColor[relationAddForm.type]"
             :marker-end="`url(#arrow-${relationAddForm.type}`"
             stroke-width="0.005"
             fill="none"
@@ -136,11 +136,11 @@
     </aside>
     <aside id="relation-legend" class="card">
       <span
-        v-for="[relationId, relationType] in Object.entries(HeroeRelation)"
+        v-for="[relationId, relationType] in Object.entries(HeroRelation)"
         :key="relationId"
         class="p-2 chip"
         :style="{
-          background: HeroeRelationToColor[relationType],
+          background: HeroRelationToColor[relationType],
           color: '#fff',
         }"
         >{{ relationType }}</span
@@ -165,15 +165,15 @@
       <div class="accordion-body">
         <ul class="menu menu-nav">
           <li
-            v-for="[relationId, relationType] in Object.entries(HeroeRelation)"
+            v-for="[relationId, relationType] in Object.entries(HeroRelation)"
             :key="relationId"
             class="menu-item"
           >
             <button
               class="btn btn-sm"
               :style="{
-                color: HeroeRelationToColor[relationType],
-                'border-color': HeroeRelationToColor[relationType],
+                color: HeroRelationToColor[relationType],
+                'border-color': HeroRelationToColor[relationType],
               }"
               @click="relationAddForm.type = relationType"
             >
@@ -192,35 +192,13 @@ import { zoom } from 'd3-zoom'
 import { drag } from 'd3-drag'
 import { scaleLinear } from 'd3-scale'
 
-function random(min, max) {
-  return Math.random() * (max - min) + min
-}
-
-function createHeroId() {
-  // TODO replace by something like UUID 4
-  return Math.floor(random(0, 99999)).toString()
-}
-
-function createHeroPoint() {
-  return {
-    x: random(0.25, 0.75),
-    y: random(0.25, 0.75),
-  }
-}
-
-const collatorCompare = new Intl.Collator('en').compare
-
-const HeroeRelation = Object.freeze({
-  ALLY: 'ally',
-  NEUTRAL: 'neutral',
-  ARCHENEMY: 'archenemy',
-})
-
-const HeroeRelationToColor = {
-  [HeroeRelation.ALLY]: '#32b643',
-  [HeroeRelation.NEUTRAL]: '#66758c',
-  [HeroeRelation.ARCHENEMY]: '#e85600',
-}
+import { createHero } from '~/js/utils'
+import {
+  HeroRelation,
+  HeroRelationToColor,
+  defaultHeroes,
+  defaultHeroRelations,
+} from '~/js/constants'
 
 const clamp = scaleLinear().domain([0, 1]).range([0, 1]).clamp(true)
 export default {
@@ -232,8 +210,7 @@ export default {
       d3Zoom: null,
       d3G: null,
       heroes: [],
-      heroesRelations: [],
-      heroeSelected: null,
+      heroRelations: [],
       heroAddForm: {
         name: '',
       },
@@ -247,18 +224,13 @@ export default {
     }
   },
   computed: {
-    heroesSorted() {
-      return [...this.heroes].sort((heroe1, heroe2) =>
-        collatorCompare(heroe1.name, heroe2.name)
-      )
-    },
     isRelationAddFormIncomplete() {
       return Object.values(this.relationAddForm).includes(null)
     },
   },
   created() {
-    this.HeroeRelation = HeroeRelation
-    this.HeroeRelationToColor = HeroeRelationToColor
+    this.HeroRelation = HeroRelation
+    this.HeroRelationToColor = HeroRelationToColor
   },
   mounted() {
     this.onResize()
@@ -316,7 +288,7 @@ export default {
 
       const that = this
       function dragged(event) {
-        const hero = that.getHeroe(this.parentNode.getAttribute('hero-id'))
+        const hero = that.getHero(this.parentNode.getAttribute('hero-id'))
         hero.x = clamp(event.x)
         hero.y = clamp(event.y)
       }
@@ -393,24 +365,15 @@ export default {
     resetCursor() {
       this.cursor = null
     },
-    getHeroe(id) {
-      return this.heroes.find((h) => h.id === id)
-    },
-    heroeSelect(heroe) {
-      this.heroeSelected = this.heroeSelected !== heroe ? heroe : null
-
-      this.resetHeroAddForm()
-      this.resetRelationAddForm()
+    getHero(id) {
+      return this.heroes.find((hero) => hero.id === id)
     },
     heroAdd() {
-      const heroe = {
-        id: createHeroId(),
-        name: this.heroAddForm.name,
-        ...createHeroPoint(),
-      }
-      this.heroes.push(heroe)
+      const hero = createHero(this.heroAddForm.name)
 
-      this.heroeSelect(heroe)
+      this.heroes.push(hero)
+
+      this.resetHeroAddForm()
 
       this.updateNextTick()
     },
@@ -418,18 +381,21 @@ export default {
       const relation = this.relationAddForm
 
       if (this.isRelationAddFormIncomplete)
+        // TODO show error on UI
         throw new Error(
           `Cannot add a relation with missing values: ${JSON.stringify(
             relation
           )}`
         )
       if (relation.from === relation.to)
+        // TODO show error on UI
         throw new Error(`Cannot add an own relation for id: ${relation.from}`)
 
-      this.heroesRelations = this.heroesRelations.filter(
+      this.heroRelations = this.heroRelations.filter(
         (r) => !(r.from === relation.from && r.to === relation.to)
       )
-      this.heroesRelations.push(relation)
+      this.heroRelations.push(relation)
+
       this.resetRelationAddForm()
     },
     resetHeroAddForm() {
@@ -445,49 +411,8 @@ export default {
       }
     },
     loadDefaultData() {
-      this.heroes = [
-        {
-          id: '0',
-          name: 'Batman',
-          x: 0.2,
-          y: 0.3,
-        },
-        { id: '1', name: 'Robin', x: 0.8, y: 0.3 },
-        { id: '2', name: 'The Joker', x: 0.5, y: 0.7 },
-        { id: '3', name: 'Superman', x: 0.2, y: 0.7 },
-      ]
-      this.heroesRelations = [
-        {
-          from: '0',
-          to: '1',
-          type: HeroeRelation.ALLY,
-        },
-        {
-          from: '1',
-          to: '0',
-          type: HeroeRelation.NEUTRAL,
-        },
-        {
-          from: '0',
-          to: '2',
-          type: HeroeRelation.ARCHENEMY,
-        },
-        {
-          from: '2',
-          to: '0',
-          type: HeroeRelation.ARCHENEMY,
-        },
-        {
-          from: '1',
-          to: '2',
-          type: HeroeRelation.ARCHENEMY,
-        },
-        {
-          from: '2',
-          to: '1',
-          type: HeroeRelation.ARCHENEMY,
-        },
-      ]
+      this.heroes = defaultHeroes
+      this.heroRelations = defaultHeroRelations
     },
   },
 }
